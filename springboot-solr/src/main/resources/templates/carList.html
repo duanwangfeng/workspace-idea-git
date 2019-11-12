@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 这是jquery的核心包  -->
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <!-- jqeuy默认的css样式 -->
+    <link rel="stylesheet" type="text/css" href="../js/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui/themes/icon.css">
+    <!-- 这是easyui的核心包  -->
+    <script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/easyui/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<body>
+关键字:<input type="text" id="carName" name="carName">
+价格：<input type="text" id="startPrice" name="startPrice">--
+     <input type="text" id="endPrice" name="endPrice">
+<input type="button" onclick="queryCar()" value="search">       <br><br>
+
+<a id="btn" href="javaScript:openDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增</a>
+
+<table id="dg"></table>
+<div id="addCarId"></div>
+
+<div id="updCarId" class="easyui-dialog" title="汽车信息修改" style="width:300px;height:200px;"
+     data-options="iconCls:'icon-save',resizable:true,closed:true,modal:true,buttons:[{
+				text:'保存',
+				handler:function(){
+                    addCar();
+				}
+			}]">
+    <form id="updForm">
+        <input type="hidden" name="carId">
+        <table align="center">
+            <tr>
+                <td>汽车名称</td>
+                <td><input class="easyui-textbox" name="carName"></td>
+            </tr>
+            <tr>
+                <td>汽车价格</td>
+                <td>
+                    <input class="easyui-textbox" name="carPrice"></td>
+                </td>
+            </tr>
+            <tr>
+                <td>汽车介绍</td>
+                <td>
+                    <textarea name="carShow"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>出厂时间</td>
+                <td>
+                    <input type="text" class="easyui-datebox" id="carTime" name="carTime">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+</body>
+<script>
+    $(function(){
+        queryCar();
+    })
+
+    function addCar() {
+        $.ajax({
+            url:"../addCar",
+            data:$("#addForm").serialize(),
+            type:"post",
+            success:function () {
+                $('#dg').datagrid('reload');
+                $('#addCarId').dialog('close');
+            },
+            error:function () {
+                alert("程序出错了！");
+            }
+        })
+    }
+
+    function openDialog() {
+        $('#addCarId').dialog({
+            title: '新增汽车信息',
+            width: 400,
+            height: 200,
+            closed: false,
+            cache: false,
+            href: '../toAddCar',
+            modal: true,
+            buttons:[{
+                text:'保存',
+                handler:function(){
+                    addCar();
+                }
+            },{
+                text:'关闭',
+                handler:function(){
+                    $('#addCarId').dialog('close');
+                }
+            }]
+        });
+    }
+
+    function queryCar() {
+        $('#dg').datagrid({
+            url:'../queryCar',
+            fitColumns:true,
+            striped:true,
+            ctrlSelect:true,
+            method:"post",
+            loadMsg:"数据库加载中。。。",
+            pagination:true,
+            pagePosition:"bottom",
+            queryParams:{
+                carName:$("#carName").val(),
+                startPrice:$("#startPrice").val(),
+                endPrice:$("#endPrice").val()
+            },
+            pageSize:5,
+            pageList:[5,15,20],
+            columns:[
+                [
+                    {field:'carId',title:'编号',width:100,align:'center'},
+                    {field:'carName',title:'汽车名称',width:100,align:'center'},
+                    {field:'carTime',title:'出厂日期',width:100,align:'center',
+                        formatter: function(value,row,index){
+                            var date =new Date(value);
+                            var tol=date.toLocaleDateString(date);
+                            return tol;
+                        }
+                    },
+                    {field:'carPrice',title:'汽车价格',width:100,align:'center'},
+                    {field:'carShow',title:'汽车介绍',width:100,align:'center'},
+                    {field:'1',title:'操作',width:100,align:'center',
+                        formatter:function (value,row,index) {
+                            return "<a href='javaScript:delCar("+row.carId+")'>删除</a> | <a href='javaScript:queryCarById("+row.carId+")'>修改</a>";
+                        }
+                    }
+                ]
+            ]
+
+        });
+    }
+
+    function queryCarById(id) {
+        $.ajax({
+            url:"../queryCarById",
+            data:{id:id},
+            type:"post",
+            success:function (data) {
+                $("#updForm").form('load',data);
+                $("#updCarId").dialog("open");
+            },
+            error:function () {
+                alert("程序出错了！");
+            }
+        })
+    }
+
+    function delCar(id) {
+        $.ajax({
+            url:"../delCar",
+            data:{id:id},
+            type:"post",
+            success:function () {
+                $('#dg').datagrid('reload');
+                alert("删除成功！");
+            },
+            error:function () {
+                alert("程序出错了！");
+            }
+        })
+    }
+</script>
+</html>

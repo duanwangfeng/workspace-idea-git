@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../jquery-1.8.0.js"></script>
+    <script src="../code/highcharts.js"></script>
+    <script src="../code/modules/exporting.js"></script>
+    <script src="../code/modules/export-data.js"></script>
+</head>
+<body>
+<!--<input type="button" value="饼状图" onclick="">-->
+
+<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container2" style="max-width:800px;height:400px"></div>
+<div id="container3" style="min-width:400px;height:400px"></div>
+<div id="container4" style="min-width:400px;height:400px"></div>
+
+<script>
+    $(function () {
+        queryCar();
+        areaCar();
+        carHistogram();
+        carHis();
+    })
+
+    function queryCar() {
+        $.ajax({
+            url:"../queryCar",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                Highcharts.chart('container', {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: '2019月销售百分比'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.y}辆</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}月</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '月销',
+                        colorByPoint: true,
+                        data: data
+                    }]
+                });
+            },
+            error:function () {
+                alert("程序出错了！");
+            }
+        })
+    }
+    
+    function areaCar() {
+        $.ajax({
+            url:"../queryHistogram",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                var chart = Highcharts.chart('container3',{
+                    chart: {
+                        type: 'area'
+                    },
+                    title: {
+                        text: '各品牌销量面积图'
+                    },
+                    subtitle: {
+                        text: '数据来源: 1905'
+                    },
+                    xAxis: {
+                        allowDecimals: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: '销售数量'
+                        },
+                        labels: {
+                            formatter: function () {
+                                return this.value / 1 + '辆';
+                            }
+                        }
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name} 销售 <b>{point.y:,.0f}</b>辆'
+                    },
+                    plotOptions: {
+                        area: {
+                            pointStart: 2019,
+                            marker: {
+                                enabled: false,
+                                symbol: 'circle',
+                                radius: 2,
+                                states: {
+                                    hover: {
+                                        enabled: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    series: data
+                });
+            },
+            error:function () {
+
+            }
+        })
+    }
+
+
+    function carHistogram() {
+        $.ajax({
+            url:"../queryHistogram",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                var chart = Highcharts.chart('container2', {
+                    title: {
+                        text: '每周销售量'
+                    },
+                    subtitle: {
+                        text: '数据来源：1905'
+                    },
+                    yAxis: {
+                        title: {
+                            text: '销售数量'
+                        }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                    },
+                    plotOptions: {
+                        series: {
+                            label: {
+                                connectorAllowed: false
+                            },
+                            pointStart: 2019
+                        }
+                    },
+                    series: data,
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                    }
+                });
+            },
+            error:function () {
+
+            }
+        })
+    }
+
+    function carHis() {
+        $.ajax({
+            url:"../queryHistogram",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                var chart = Highcharts.chart('container4',{
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: '月每天销量'
+                    },
+                    subtitle: {
+                        text: '数据来源: 1905'
+                    },
+                    xAxis: {
+                        categories: [
+                            '一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'
+                        ],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: '销售量 (辆)'
+                        }
+                    },
+                    tooltip: {
+                        // head + 每个 point + footer 拼接成完整的 table
+                        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                            '<td style="padding:0"><b>{point.y} 辆</b></td></tr>',
+                        footerFormat: '</table>',
+                        shared: true,
+                        useHTML: true
+                    },
+                    plotOptions: {
+                        column: {
+                            borderWidth: 0
+                        }
+                    },
+                    series: data
+                });
+            },
+            error:function () {
+
+            }
+        })
+    }
+</script>
+</body>
+</html>

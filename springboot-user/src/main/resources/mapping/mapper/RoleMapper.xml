@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.role.mapper.RoleMapper" >
+
+
+  <select id="queryRole" resultType="com.jk.role.model.Role">
+    SELECT  * FROM t_role
+  </select>
+
+  <delete id="delRolePowerByRoleId" parameterType="int">
+    delete from t_role_power where t_role_id = #{roleId}
+  </delete>
+
+  <insert id="addRolePower" parameterType="java.util.List">
+    insert into t_role_power values
+    <foreach collection="list" item="p" separator=",">
+      (#{p.rpid},#{p.roleId},#{p.powerId})
+    </foreach>
+  </insert>
+
+  <select id="queryPowerInfo" resultType="com.jk.role.model.PowerInfo">
+	select * from t_powerinfo where powerId=#{powerId}
+  </select>
+
+</mapper>

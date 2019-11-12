@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.tree.mapper.TreeMapper" >
+
+  <select id="queryPowerTree" resultType="com.jk.tree.model.Power">
+    select * from t_tree
+  </select>
+
+  <select id="queryRolePowerTree" resultType="com.jk.tree.model.RolePower">
+    select rp.t_rpid rpid ,rp.t_role_id roleId,rp.t_power_id powerId from t_tree t
+	left join t_role_power rp on t.id = rp.t_power_id
+	where rp.t_role_id = #{id}
+  </select>
+
+  <select id="queryTreeByUser" resultType="com.jk.tree.model.Tree">
+		select * from t_tree t
+		left join t_role_power rp on t.id = rp.t_power_id
+		left join t_user_role ur on rp.t_role_id = ur.t_roleId
+		where t.pid =#{id} and ur.t_userId = #{userId}
+		group by t.id
+  </select>
+
+</mapper>

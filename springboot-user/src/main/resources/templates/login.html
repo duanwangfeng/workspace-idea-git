@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-1.8.0.js"></script>
+</head>
+<body>
+<form id="loginForm">
+    <table align="center">
+        <tr>
+            <td>用户名</td>
+            <td>
+                <input type="text" name="userName">
+            </td>
+        </tr>
+        <tr>
+            <td>密码</td>
+            <td>
+                <input type="text" name="userPwd">
+            </td>
+        </tr>
+        <tr align="center">
+            <td colspan="2">
+                <input type="button" onclick="login()" value="登录">
+                <input type="button" onclick="" value="注册">
+            </td>
+        </tr>
+</table>
+</form>
+
+<script>
+    function login() {
+        $.ajax({
+            url:"../user/login",
+            data:$("#loginForm").serialize(),
+            success:function (data) {
+                if (data=="success"){
+                    location.href="../toMain";
+                }
+                if (data=="userError"){
+                    alert("账号不存在！");
+                }
+                if (data=="pwdError"){
+                    alert("密码错误！");
+                }
+            },
+            error:function () {
+                alert("程序出错了！");
+            }
+        })
+    }
+</script>
+</body>
+</html>

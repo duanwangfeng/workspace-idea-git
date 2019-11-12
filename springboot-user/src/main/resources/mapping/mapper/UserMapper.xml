@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.user.mapper.UserMapper" >
+
+
+  <select id="querySum" resultType="int">
+    select count(DISTINCT tu.userId) from t_user tu
+    left join t_user_role ur on tu.userId = ur.t_userId
+    left join t_role tr on ur.t_roleId = tr.rid
+  </select>
+
+  <select id="queryUser" resultType="com.jk.user.model.User">
+    select tu.*,group_concat(tr.rname separator',') rname from t_user tu
+    left join t_user_role ur on tu.userId = ur.t_userId
+    left join t_role tr on ur.t_roleId = tr.rid
+    group by tu.userId
+     limit #{s},#{r}
+  </select>
+
+  <insert id="addUser" parameterType="com.jk.user.model.User" useGeneratedKeys="true" keyProperty="userId">
+    insert into t_user(userName,userPwd,userSex,userPhone,userDate) values(#{userName},#{userPwd},#{userSex},#{userPhone},#{userDate})
+  </insert>
+
+  <insert id="addUserRole" parameterType="java.util.List">
+    insert into t_user_role(t_userId,t_roleId) values
+    <foreach collection="list" item="u" separator=",">
+      (#{u.userId},#{u.roleId})
+    </foreach>
+  </insert>
+
+  <select id="queryUserByName" resultType="com.jk.user.model.User">
+    select * from t_user where userName = #{userName}
+  </select>
+
+</mapper>
