@@ -34,6 +34,7 @@ public class CarController {
 
     @RequestMapping("toCarList")
     public String toCarList(){
+        System.err.println(111111);
 
         return "carList";
     }
