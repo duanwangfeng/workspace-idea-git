@@ -36,6 +36,8 @@ public class CarController {
     public String toCarList(){
         System.err.println(111111);
 
+        System.err.println(222222);
+
         return "carList";
     }
 
